@@ -16,23 +16,25 @@ const Modes = {
     Delete: 1
 };
 
+const Mode = Mode.Search;
+
+const config = JSON.parse(fs.readFileSync("./config.json", "utf-8"));
 const state = {
     // Note: all IDs should be in the form of strings, NOT ints
-    authToken: "", // Your usertoken
-    authorId: "",
+    authToken: config.authToken,
+
+    authorId: config.authorId,
+    guildId: config.guildId, // Leave blank when searching DMs
+    channelId: config.channelId,
 
     minId: "",
     maxId: "",
     content: "",
-    guildId: "", // Leave blank when searching DMs
-    channelId: "",
 
     offset: 0, // In messages, NOT pages
     
     currentFile: undefined,
-    data: [],
-
-    mode: Modes.Search
+    data: []
 };
 
 const API_SEARCH_URL = (() => state.guildId
@@ -174,7 +176,7 @@ process.on("SIGINT", () => { // Control + C failsafe.
 });
 
 (async () => {
-    switch (state.mode) {
+    switch (Mode) {
         case Modes.Search:
             await handleSearchMode();
             break;
