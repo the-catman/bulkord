@@ -40,6 +40,18 @@ This tool is not safe for script kiddies. Use at your own risk.
 
 (For normal 25-message files, this counter never triggers because when all messages are deleted, the corresponding file is also deleted, and the counter resets back to 0).
 
-## Coming up
+## Data Package mode
 
-\- Mass deletion using data packages.  
+Put your data package in the same folder as `extract.js`. It should be named `Package` and should have a subfolder within it called `Messages`. Run `node extract.js`. This should extract all messages into `./messages`. Run the script in delete mode, as explained further in [#usage](#usage).
+
+## Usage
+
+Run `npm install`. This will install the necessary dependancies.
+
+Next, run `node setup.js`. A file called config.json should be created. Edit it with the appropriate information.
+
+Finally, select your mode by changing the line `const Mode = Modes...`;
+
+Finally, run `node main.js`.
+
+Note: you don't need anything except the token if you're just deleting. The guild, channel, and author IDs are only necessary when running search mode.

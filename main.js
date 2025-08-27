@@ -1,5 +1,12 @@
-import fs from "node:fs";
-import { createHash } from "node:crypto";
+const fs = require("node:fs");
+const { createHash } = require("node:crypto");
+
+const Modes = {
+    Search: 0,
+    Delete: 1
+};
+
+const Mode = Modes.Search;
 
 fs.mkdirSync("./messages", { recursive: true });
 
@@ -10,13 +17,6 @@ const queryString = params => params
     .filter(p => p[1] !== undefined)
     .map(p => p[0] + '=' + encodeURIComponent(p[1]))
     .join('&');
-
-const Modes = {
-    Search: 0,
-    Delete: 1
-};
-
-const Mode = Mode.Search;
 
 const config = JSON.parse(fs.readFileSync("./config.json", "utf-8"));
 const state = {
