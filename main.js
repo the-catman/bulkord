@@ -1,13 +1,6 @@
 const fs = require("node:fs");
 const { createHash } = require("node:crypto");
 
-const Modes = {
-    Search: 0,
-    Delete: 1
-};
-
-const Mode = Modes.Search;
-
 fs.mkdirSync("./messages", { recursive: true });
 
 const sleep = ms => new Promise(res => setTimeout(res, ms));
@@ -22,14 +15,13 @@ const config = JSON.parse(fs.readFileSync("./config.json", "utf-8"));
 const state = {
     // Note: all IDs should be in the form of strings, NOT ints
     authToken: config.authToken,
-
     authorId: config.authorId,
     guildId: config.guildId, // Leave blank when searching DMs
     channelId: config.channelId,
-
-    minId: "",
-    maxId: "",
-    content: "",
+    mode: config.mode, // 'search' or 'delete'.
+    minId: config.minId,
+    maxId: config.maxId,
+    content: config.content,
 
     offset: 0, // In messages, NOT pages
     
@@ -176,12 +168,15 @@ process.on("SIGINT", () => { // Control + C failsafe.
 });
 
 (async () => {
-    switch (Mode) {
-        case Modes.Search:
+    switch (config.mode.toLowerCase()) {
+        case "search":
             await handleSearchMode();
             break;
-        case Modes.Delete:
+        case "delete":
             await handleDeleteMode();
+            break;
+        default:
+            console.error(`Unexpected mode! Mode needs to be either 'search' or 'delete'.`);
             break;
     }
 })();
