@@ -138,7 +138,7 @@ async function handleDeleteMode() {
             const [channelId, messageId] = state.data.pop();
 
             await deleteMessage(channelId, messageId);
-            await sleep(randMinMax(1250, 2000)); // Average: 1.625 seconds
+            await sleep(randMinMax(1000, 2000)); // Average: 1.5 seconds
 
             if(++ctr === 100) {
                 saveProgress();
