@@ -117,7 +117,7 @@ async function handleSearchMode() {
         state.offset += messages.length;
 
         const serialized = JSON.stringify(messages);
-        fs.writeFileSync(`./messages/${state.channelId}_${sha256(serialized)}.json`, serialized);
+        fs.writeFileSync(`./messages/${sha256(serialized)}.json`, serialized);
 
         await sleep(randMinMax(500, 1500)); // Average: 1 second
         console.log(`Fetched ${state.offset}/${searchPage.total_results} total messages.`);
