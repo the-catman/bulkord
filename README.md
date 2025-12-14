@@ -22,8 +22,6 @@ After each search/delete, there is a randomized cooldown that exists to prevent 
 
 In search mode, messages are first searched in bulk and stored in the `./messages` folder, alongside their respective channel IDs. Each search yields around 25 messages, which are then stored in a file in `./messages`.
 
-(The name of the file is simply the SHA-256 hash of the file contents).
-
 ## Delete mode
 
 In delete mode, a file in `./messages` will be picked, and messages in that file are deleted one by one. When a file has run out of messages, it will simply be deleted.

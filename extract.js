@@ -12,5 +12,5 @@ for (const folder of folders) {
 
     if (messages.length === 0) continue;
 
-    fs.writeFileSync(`./messages/${channelId}.json`, JSON.stringify(messages));
+    fs.writeFileSync(`./messages/${channelId}_package.json`, JSON.stringify(messages));
 }
