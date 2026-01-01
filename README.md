@@ -1,49 +1,43 @@
-# Bulkord - Bulk Delete Discord Messages
+# Bulkord
+
+Bulk Delete Discord Messages
 
 ⚠️ Work in Progress
 
-Discretion: Using self-bots or user tokens violates Discord's Terms of Service and may result in account termination.
+## Warning
 
-This tool is not safe for script kiddies. Use at your own risk.
+Using self-bots or user tokens violates Discord’s Terms of Service and may result in account termination. This tool is unsafe for script kiddies and should be used entirely at your own risk.
 
-## Info
+## Overview
 
-This tool lets you search and delete your own messages in bulk from Discord.
+Bulkord allows you to search and bulk delete your own Discord messages.
 
-It operates in two modes: Search (search messages only) or Delete (delete messages from stored files).
+The tool operates in two modes. Search mode retrieves messages and stores them locally without deleting anything. Delete mode reads previously stored message files and deletes those messages from Discord.
 
-It supports filtering by author, channel, message content, and message IDs (min/max) to narrow down what messages are searched or deleted.
+Filtering is supported by author ID, channel ID, message content, and minimum or maximum message IDs. After each search or delete action, a randomized cooldown is applied to reduce the likelihood of triggering rate limits. HTTP 429 responses are handled automatically and retried as needed.
 
-It's recommended that your Discord client is running while this is happening (maintains a WebSocket gateway to reduce termination risk). It's also recommended that you do not **send messages**, as this is known to trigger Discord's anti-bot.
+Running a Discord client during operation is strongly recommended, as maintaining a WebSocket connection reduces termination risk. Sending messages while the script is running is known to trigger Discord’s anti-bot systems and should be avoided.
 
-After each search/delete, there is a randomized cooldown that exists to prevent tripping Discord's ratelimits. Despite this, the tool automatically handles rate limits and will retry searching or deleting messages if a 429 response is received.
+## Search Mode
 
-## Search mode
+In search mode, messages are retrieved in batches of roughly 25 and written to the `./messages` directory. No deletions occur during this process.
 
-In search mode, messages are first searched in bulk and stored in the `./messages` folder, alongside their respective channel IDs. Each search yields around 25 messages, which are then stored in a file in `./messages`.
+## Delete Mode
 
-## Delete mode
+In delete mode, files inside the `./messages` directory are processed sequentially. Messages within each file are deleted one by one. Once a file has no remaining messages, it is automatically removed. The script can be safely stopped at any time using Ctrl+C, and progress is saved automatically.
 
-In delete mode, a file in `./messages` will be picked, and messages in that file are deleted one by one. When a file has run out of messages, it will simply be deleted.
+If a custom file in `./messages` contains more than 100 messages, progress is saved every 100 deletions to prevent significant data loss in the event of interruption.
 
-You can safely stop the script at any time with Ctrl+C, and progress will be saved automatically.
-
-In the event that custom files are put in `./messages`, with number of messages above 100, progress is automatically saved every 100 messages.
-
-This protects against losing a large amount of progress if the script is interrupted for whatever reason.
-
-(For normal 25-message files, this never triggers)
+Note that you must still have access to the guilds and channels in order to delete messages. Messages from servers or channels you no longer have access to cannot be deleted.
 
 ## Usage
 
-Run `node setup.js`. A file called config.json should be created. Edit it with the appropriate information.
+Run `node setup.js` to generate a `config.json` file, then edit that file with the appropriate values. After configuration, run `node main.js`.
 
-Next, run `node main.js`.
+If you are only deleting messages, only the token is required. Guild ID, channel ID, and author ID are only necessary when running search mode.
 
-Note: you don't need anything except the token if you're just deleting. The guild, channel, and author IDs are only necessary when running search mode.
+## Special: Discord Data Package Extraction
 
-## Special - Data Package Extraction
+Bulkord can also delete messages extracted from your official Discord data package.
 
-Run `npm install`. This will install the necessary dependancies to process your data package.
-
-Put your data package in the same folder as `extract.js`. It should be named `Package` and should have a subfolder within it called `Messages`. Run `node extract.js`. This should extract all messages into `./messages`. Finally, run the script in delete mode.
+First, run `npm install` to install the required dependencies. Place your Discord data export in the same directory as `extract.js`. The folder must be named `Package` and must contain a subfolder named `Messages`. Run `node extract.js` to extract all messages into the `./messages` directory. After extraction, run Bulkord in delete mode to delete the messages.

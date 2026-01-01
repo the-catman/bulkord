@@ -24,7 +24,7 @@ const state = {
     content: config.content,
 
     offset: 0, // In messages, NOT pages
-    
+
     currentFile: undefined,
     data: []
 };
@@ -119,7 +119,7 @@ async function handleSearchMode() {
         const serialized = JSON.stringify(messages);
         fs.writeFileSync(`./messages/${sha256(serialized)}.json`, serialized);
 
-        await sleep(randMinMax(500, 1500)); // Average: 1 second
+        await sleep(randMinMax(1000, 2000)); // Average: 1.5 seconds
         console.log(`Fetched ${state.offset}/${searchPage.total_results} total messages.`);
     } while (searchPage.total_results > state.offset);
 }
@@ -138,9 +138,9 @@ async function handleDeleteMode() {
             const [channelId, messageId] = state.data.pop();
 
             await deleteMessage(channelId, messageId);
-            await sleep(randMinMax(1000, 2000)); // Average: 1.5 seconds
+            await sleep(randMinMax(1500, 2000)); // Average: 1.75 seconds
 
-            if(++ctr === 100) {
+            if (++ctr === 100) {
                 saveProgress();
                 ctr = 0;
             }
