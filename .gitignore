@@ -1,0 +1,10 @@
+node_modules/
+Package/
+
+# SQLite databases
+*.db
+*.sqlite
+*.sqlite3
+
+package-lock.json
+config.json
