@@ -1,6 +1,38 @@
 {
-  "dependencies": {
-    "better-sqlite3": "^12.5.0",
-    "json-bigint": "^1.0.0"
-  }
+    "name": "bulkord",
+    "version": "1.0.0",
+    "description": "Bulk Discord message search and delete tool",
+    "main": "electron/app.js",
+    "scripts": {
+        "start": "electron .",
+        "build": "electron-builder --win",
+        "postinstall": "electron-builder install-app-deps",
+        "cli": "node cli.js"
+    },
+    "dependencies": {
+        "better-sqlite3": "^12.5.0",
+        "json-bigint": "^1.0.0"
+    },
+    "devDependencies": {
+        "electron": "^33.0.0",
+        "electron-builder": "^25.1.8"
+    },
+    "build": {
+        "appId": "com.bulkord.app",
+        "productName": "Bulkord",
+        "directories": {
+            "output": "dist"
+        },
+        "files": [
+            "main.js",
+            "electron/**/*",
+            "renderer/**/*"
+        ],
+        "win": {
+            "target": "portable"
+        },
+        "portable": {
+            "artifactName": "Bulkord.exe"
+        }
+    }
 }

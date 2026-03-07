@@ -1,5 +1,6 @@
 node_modules/
 Package/
+dist/
 
 # SQLite databases
 *.db
