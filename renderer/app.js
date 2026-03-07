@@ -162,6 +162,58 @@ document.getElementById("cancelDelete").addEventListener("click", async () => {
     document.getElementById("deleteInfo").textContent = "Cancelling...";
 });
 
+// --- Extract ---
+let extracting = false;
+let extractPath = null;
+
+document.getElementById("selectExtractFolder").addEventListener("click", async () => {
+    if (extracting) return;
+    const result = await window.bulkord.selectExtractFolder();
+    if (result.canceled) return;
+
+    extractPath = result.path;
+    document.getElementById("extractPathLabel").textContent = extractPath;
+    document.getElementById("startExtract").disabled = false;
+});
+
+document.getElementById("startExtract").addEventListener("click", async () => {
+    if (extracting || !extractPath) return;
+    extracting = true;
+
+    const btn = document.getElementById("startExtract");
+    const progressArea = document.getElementById("extractProgress");
+    const info = document.getElementById("extractInfo");
+
+    btn.disabled = true;
+    progressArea.style.display = "block";
+    info.textContent = "Extracting...";
+    info.style.color = "";
+    document.getElementById("extractFill").style.width = "0%";
+    document.getElementById("extractText").textContent = "Processing 0 / 0 channels";
+
+    window.bulkord.onExtractProgress(({ current, totalFolders, messagesExtracted }) => {
+        const pct = totalFolders > 0 ? Math.min((current / totalFolders) * 100, 100) : 0;
+        document.getElementById("extractFill").style.width = pct + "%";
+        document.getElementById("extractText").textContent =
+            `Processing ${current} / ${totalFolders} channels (${messagesExtracted.toLocaleString()} messages)`;
+    });
+
+    const result = await window.bulkord.startExtract(extractPath);
+    extracting = false;
+    btn.disabled = false;
+
+    if (result.success) {
+        document.getElementById("extractFill").style.width = "100%";
+        info.textContent = `Extracted ${result.messages.toLocaleString()} messages from ${result.channels} channels.`;
+        info.style.color = "var(--green)";
+    } else {
+        info.textContent = `Error: ${result.error}`;
+        info.style.color = "var(--red)";
+    }
+
+    setTimeout(() => { info.style.color = ""; }, 5000);
+});
+
 // --- Status ---
 async function refreshStatus() {
     const { config, messageCount } = await window.bulkord.getStatus();

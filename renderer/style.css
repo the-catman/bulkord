@@ -416,3 +416,26 @@ input::placeholder {
     font-size: 13px;
     margin-top: 4px;
 }
+
+/* ---- Extract ---- */
+.extract-path-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.extract-path-label {
+    color: var(--text-muted);
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+}
+
+code {
+    background: var(--bg-tertiary);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 13px;
+}

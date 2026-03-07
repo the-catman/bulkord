@@ -20,11 +20,12 @@ Running a Discord client during the operation is strongly recommended, as this r
 
 Run the portable `Bulkord.exe`, no installation required.
 
-The app has four panels:
+The app has five panels:
 
 - **Configure:** set your auth token, author ID, guild/channel IDs, and optional filters.
 - **Search:** search for messages and store them in the local database.
 - **Delete:** delete all messages currently stored in the database.
+- **Extract:** import messages from a Discord data package into the database (see [Discord Data Package Extraction](#discord-data-package-extraction)).
 - **Status:** view current configuration and database message count.
 
 Config and database are stored in `%APPDATA%/bulkord/`.
@@ -85,13 +86,19 @@ Note that you must still have access to the guilds and channels in order to dele
 
 Bulkord can also delete messages extracted from your official Discord data package.
 
+### Desktop App
+
+Open the **Extract** panel, click **Browse** to select the `Messages` folder from your Discord data package, then click **Start Extraction**. Progress is shown as each channel is processed. After extraction, switch to the **Delete** panel to delete the messages.
+
+### CLI
+
 Place your Discord data export in the same directory as `extract.js`. The folder must be named `Package` and must contain a subfolder named `Messages`. Then run:
 
 ```
 node extract.js
 ```
 
-This extracts all messages into the database. After extraction, switch to delete mode (via the app or CLI) to delete the messages.
+This extracts all messages into the database. After extraction, switch to delete mode to delete the messages.
 
 ## Acknowledgements
 

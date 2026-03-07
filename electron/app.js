@@ -1,6 +1,7 @@
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow, ipcMain, dialog } = require("electron");
 const path = require("path");
 const fs = require("fs");
+const JSONbig = require("json-bigint")({ useNativeBigInt: true });
 const { createInstance } = require("../main");
 
 let mainWindow;
@@ -141,4 +142,76 @@ ipcMain.handle("operation:cancel", () => {
         activeInstance.cancel();
     }
     return { success: true };
+});
+
+ipcMain.handle("extract:select-folder", async () => {
+    const result = await dialog.showOpenDialog(mainWindow, {
+        title: "Select Discord Data Package Messages Folder",
+        properties: ["openDirectory"],
+    });
+    if (result.canceled || result.filePaths.length === 0) return { canceled: true };
+    return { canceled: false, path: result.filePaths[0] };
+});
+
+ipcMain.handle("extract:start", async (_event, packagePath) => {
+    const Database = require("better-sqlite3");
+    const db = new Database(DB_PATH);
+
+    db.exec(`
+        PRAGMA journal_mode = WAL;
+        PRAGMA synchronous = NORMAL;
+
+        CREATE TABLE IF NOT EXISTS messages (
+            channel_id TEXT NOT NULL,
+            message_id TEXT NOT NULL,
+            PRIMARY KEY (channel_id, message_id)
+        );
+    `);
+
+    const insertStmt = db.prepare(
+        "INSERT OR IGNORE INTO messages (channel_id, message_id) VALUES (?, ?)"
+    );
+    const insertTx = db.transaction(rows => {
+        for (const [c, m] of rows) insertStmt.run(c, m);
+    });
+
+    try {
+        const folders = fs.readdirSync(packagePath).filter(f => f.startsWith("c"));
+        if (folders.length === 0) {
+            db.close();
+            return { success: false, error: "No channel folders found. Make sure you selected the Messages folder from your Discord data package." };
+        }
+
+        let total = 0;
+        for (let i = 0; i < folders.length; i++) {
+            const folder = folders[i];
+            const channelFile = path.join(packagePath, folder, "channel.json");
+            const messagesFile = path.join(packagePath, folder, "messages.json");
+
+            if (!fs.existsSync(channelFile) || !fs.existsSync(messagesFile)) continue;
+
+            const channelId = JSON.parse(fs.readFileSync(channelFile, "utf-8")).id;
+            const messages = JSONbig.parse(fs.readFileSync(messagesFile, "utf-8"))
+                .map(message => [channelId, String(message.ID)]);
+
+            if (messages.length === 0) continue;
+
+            insertTx(messages);
+            total += messages.length;
+
+            if (mainWindow && !mainWindow.isDestroyed()) {
+                mainWindow.webContents.send("extract:progress", {
+                    current: i + 1,
+                    totalFolders: folders.length,
+                    messagesExtracted: total,
+                });
+            }
+        }
+
+        db.close();
+        return { success: true, messages: total, channels: folders.length };
+    } catch (err) {
+        db.close();
+        return { success: false, error: err.message };
+    }
 });
