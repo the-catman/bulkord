@@ -189,3 +189,17 @@ function createInstance(config, dbPath = "messages.db") {
 }
 
 module.exports = { createInstance };
+
+if (require.main === module) {
+    const config = require("./config.json");
+    const instance = createInstance(config);
+
+    (async () => {
+        if (config.mode === "search") {
+            await instance.handleSearchMode();
+        } else if (config.mode === "delete") {
+            await instance.handleDeleteMode();
+        }
+        instance.close();
+    })();
+}
