@@ -75,9 +75,9 @@ Note that you must still have access to the guilds and channels in order to dele
 | Field | Required | Description |
 |---|---|---|
 | `authToken` | Yes | Discord user token |
-| `authorId` | Search only | Your Discord user ID |
+| `authorId` | No | Your Discord user ID (leave blank to search for everyone) |
 | `guildId` | Search only | Server ID (leave blank for DMs) |
-| `channelId` | Search only | Channel ID |
+| `channelId` | Search only | Channel ID (leave blank to search the entire server) |
 | `minId` | No | Only search messages after this ID |
 | `maxId` | No | Only search messages before this ID |
 | `content` | No | Filter by message content |
