@@ -23,8 +23,11 @@ jobs:
       - name: Build app
         run: npm run build
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
         with:
-          name: Bulkord-${{ github.sha }}
-          path: dist/*.exe
+          tag_name: build-${{ github.run_number }}
+          files: dist/*.exe
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
