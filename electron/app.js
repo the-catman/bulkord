@@ -73,7 +73,6 @@ ipcMain.handle("search:start", async () => {
     const config = loadConfig();
     if (!config) return { success: false, error: "No configuration found." };
     if (!config.authToken) return { success: false, error: "Auth token is not set." };
-    if (!config.authorId) return { success: false, error: "Author ID is not set." };
     if (!config.guildId && !config.channelId) return { success: false, error: "Guild ID or Channel ID must be set." };
 
     activeInstance = createInstance(config, DB_PATH);
