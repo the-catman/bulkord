@@ -272,3 +272,12 @@ function makeConfirmBtn(btnId, label, action, toastId) {
 
 makeConfirmBtn("clearConfig", "Clear Config", window.bulkord.clearConfig, "dataMgmtStatus");
 makeConfirmBtn("clearDb", "Clear Database", window.bulkord.clearDb, "dataMgmtStatus");
+
+document.getElementById("openFileLocation").addEventListener("click", async () => {
+    const result = await window.bulkord.openFileLocation();
+    if (result.success) {
+        showToast(document.getElementById("dataMgmtStatus"), "Opening file location...", "success");
+    } else {
+        showToast(document.getElementById("dataMgmtStatus"), `Error: ${result.error}`, "error");
+    }
+});

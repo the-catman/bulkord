@@ -13,6 +13,7 @@ contextBridge.exposeInMainWorld("bulkord", {
 
     clearConfig: () => ipcRenderer.invoke("data:clear-config"),
     clearDb: () => ipcRenderer.invoke("data:clear-db"),
+    openFileLocation: () => ipcRenderer.invoke("data:open-location"),
 
     onSearchProgress: (callback) => {
         ipcRenderer.removeAllListeners("search:progress");

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog } = require("electron");
+const { app, BrowserWindow, ipcMain, dialog, shell } = require("electron");
 const path = require("path");
 const fs = require("fs");
 const JSONbig = require("json-bigint")({ useNativeBigInt: true });
@@ -155,6 +155,16 @@ ipcMain.handle("data:clear-config", () => {
 ipcMain.handle("data:clear-db", () => {
     try {
         if (fs.existsSync(DB_PATH)) fs.unlinkSync(DB_PATH);
+        return { success: true };
+    } catch (err) {
+        return { success: false, error: err.message };
+    }
+});
+
+ipcMain.handle("data:open-location", () => {
+    try {
+        const userPath = app.getPath("userData");
+        shell.showItemInFolder(userPath);
         return { success: true };
     } catch (err) {
         return { success: false, error: err.message };
