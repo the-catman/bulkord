@@ -11,6 +11,9 @@ contextBridge.exposeInMainWorld("bulkord", {
     selectExtractFolder: () => ipcRenderer.invoke("extract:select-folder"),
     startExtract: (path) => ipcRenderer.invoke("extract:start", path),
 
+    clearConfig: () => ipcRenderer.invoke("data:clear-config"),
+    clearDb: () => ipcRenderer.invoke("data:clear-db"),
+
     onSearchProgress: (callback) => {
         ipcRenderer.removeAllListeners("search:progress");
         ipcRenderer.on("search:progress", (_event, data) => callback(data));

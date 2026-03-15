@@ -433,6 +433,65 @@ input::placeholder {
     min-width: 0;
 }
 
+/* ---- Checkbox ---- */
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
+    padding: 12px 0;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--blurple);
+    cursor: pointer;
+    flex-shrink: 0;
+    margin: 0;
+}
+
+.checkbox-group label {
+    display: inline;
+    margin-bottom: 0;
+    text-transform: none;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-normal);
+    cursor: pointer;
+    letter-spacing: 0;
+}
+
+/* ---- Data Management ---- */
+.data-mgmt-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.data-mgmt-row:last-of-type {
+    border-bottom: none;
+}
+
+.data-mgmt-label {
+    color: var(--text-normal);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.btn-sm {
+    padding: 6px 16px;
+    font-size: 13px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 32px;
+}
+
 code {
     background: var(--bg-tertiary);
     padding: 1px 5px;

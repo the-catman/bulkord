@@ -6,7 +6,8 @@ fs.writeFileSync("config.json", `{
     "guildId": "",
     "channelId": "",
     "mode": "search",
-    "minId": "",
-    "maxId": "",
-    "content": ""
+    "startMessageId": "",
+    "endMessageId": "",
+    "content": "",
+    "skipPinned": false
 }`);

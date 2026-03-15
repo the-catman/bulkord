@@ -22,13 +22,20 @@ Run the portable `Bulkord.exe`, no installation required.
 
 The app has five panels:
 
-- **Configure:** set your auth token, author ID, guild/channel IDs, and optional filters.
+- **Configure:** set your auth token, author ID, guild/channel IDs, and optional filters (message ID range, content, skip pinned).
 - **Search:** search for messages and store them in the local database.
 - **Delete:** delete all messages currently stored in the database.
 - **Extract:** import messages from a Discord data package into the database (see [Discord Data Package Extraction](#discord-data-package-extraction)).
-- **Status:** view current configuration and database message count.
+- **Status:** view current configuration and database message count. Includes a **Data Management** section to clear the config file or database.
 
 Config and database are stored in `%APPDATA%/bulkord/`.
+
+#### Data Management
+
+In the **Status** panel, you can use the **Data Management** section to clear your configuration or database:
+
+- **Clear Config:** deletes the `config.json` file (double-click to confirm)
+- **Clear Database:** deletes the `messages.db` file (double-click to confirm)
 
 ### Building from Source
 
@@ -78,9 +85,10 @@ Note that you must still have access to the guilds and channels in order to dele
 | `authorId` | No | Your Discord user ID (leave blank to search for everyone) |
 | `guildId` | Search only | Server ID (leave blank for DMs) |
 | `channelId` | Search only | Channel ID (leave blank to search the entire server) |
-| `minId` | No | Only search messages after this ID |
-| `maxId` | No | Only search messages before this ID |
+| `startMessageId` | No | Only search messages after this ID |
+| `endMessageId` | No | Only search messages before this ID |
 | `content` | No | Filter by message content |
+| `skipPinned` | No | If enabled, pinned messages will not be added to the database |
 
 ## Discord Data Package Extraction
 

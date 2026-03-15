@@ -143,6 +143,24 @@ ipcMain.handle("operation:cancel", () => {
     return { success: true };
 });
 
+ipcMain.handle("data:clear-config", () => {
+    try {
+        if (fs.existsSync(CONFIG_PATH)) fs.unlinkSync(CONFIG_PATH);
+        return { success: true };
+    } catch (err) {
+        return { success: false, error: err.message };
+    }
+});
+
+ipcMain.handle("data:clear-db", () => {
+    try {
+        if (fs.existsSync(DB_PATH)) fs.unlinkSync(DB_PATH);
+        return { success: true };
+    } catch (err) {
+        return { success: false, error: err.message };
+    }
+});
+
 ipcMain.handle("extract:select-folder", async () => {
     const result = await dialog.showOpenDialog(mainWindow, {
         title: "Select Discord Data Package Messages Folder",

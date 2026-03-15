@@ -63,17 +63,21 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="minId">Min Message ID <span class="optional">optional</span></label>
-                        <input type="text" id="minId" placeholder="Earliest message ID">
+                        <label for="startMessageId">Delete After Message ID <span class="optional">optional</span></label>
+                        <input type="text" id="startMessageId" placeholder="Earliest message ID">
                     </div>
                     <div class="form-group">
-                        <label for="maxId">Max Message ID <span class="optional">optional</span></label>
-                        <input type="text" id="maxId" placeholder="Latest message ID">
+                        <label for="endMessageId">Delete Before Message ID <span class="optional">optional</span></label>
+                        <input type="text" id="endMessageId" placeholder="Latest message ID">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="content">Content Filter <span class="optional">optional</span></label>
                     <input type="text" id="content" placeholder="Filter by message content">
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="skipPinned">
+                    <label for="skipPinned">Skip pinned messages</label>
                 </div>
                 <div class="form-actions">
                     <button class="btn btn-primary" id="saveConfig">Save Configuration</button>
@@ -168,6 +172,18 @@
                         <div id="statusDb" class="status-items">
                             <p class="text-muted">Loading...</p>
                         </div>
+                    </div>
+                    <div class="status-card">
+                        <h3>Data Management</h3>
+                        <div class="data-mgmt-row">
+                            <span class="data-mgmt-label">config.json</span>
+                            <button class="btn btn-danger btn-sm" id="clearConfig">Clear Config</button>
+                        </div>
+                        <div class="data-mgmt-row">
+                            <span class="data-mgmt-label">messages.db</span>
+                            <button class="btn btn-danger btn-sm" id="clearDb">Clear Database</button>
+                        </div>
+                        <div id="dataMgmtStatus" class="toast"></div>
                     </div>
                 </div>
             </section>

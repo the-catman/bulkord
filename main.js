@@ -48,8 +48,8 @@ function createInstance(config, dbPath = "messages.db") {
         const params = [
             ['sort_order', 'desc'],
             ['sort_by', 'timestamp'],
-            ['min_id', config.minId || undefined],
-            ['max_id', config.maxId || undefined],
+            ['min_id', config.startMessageId || undefined],
+            ['max_id', config.endMessageId || undefined],
             ['offset', offset || undefined],
             ['content', config.content || undefined],
             ['author_id', config.authorId || undefined],
@@ -131,18 +131,22 @@ function createInstance(config, dbPath = "messages.db") {
             if (cancelled) break;
             searchPage = await search();
 
-            const messages = searchPage.messages
-                .filter(m => m.length && m[0]?.channel_id && m[0]?.id)
+            const allMessages = searchPage.messages
+                .filter(m => m.length && m[0]?.channel_id && m[0]?.id);
+            const messages = allMessages
+                .filter(m => !(config.skipPinned && m[0]?.pinned))
                 .map(m => [m[0].channel_id, m[0].id]);
 
-            if (messages.length === 0) break;
+            if (allMessages.length === 0) break;
 
-            offset += messages.length;
+            offset += allMessages.length;
 
-            const tx = db.transaction(rows => {
-                for (const [c, m] of rows) insertStmt.run(c, m);
-            });
-            tx(messages);
+            if (messages.length > 0) {
+                const tx = db.transaction(rows => {
+                    for (const [c, m] of rows) insertStmt.run(c, m);
+                });
+                tx(messages);
+            }
 
             await sleep(randMinMax(1000, 2000));
             if (progressCallback) {

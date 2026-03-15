@@ -27,7 +27,7 @@ function showToast(el, message, type) {
 }
 
 // --- Configure ---
-const configFields = ["authToken", "authorId", "guildId", "channelId", "minId", "maxId", "content"];
+const configFields = ["authToken", "authorId", "guildId", "channelId", "startMessageId", "endMessageId", "content"];
 
 async function loadConfigIntoForm() {
     const config = await window.bulkord.loadConfig();
@@ -36,6 +36,7 @@ async function loadConfigIntoForm() {
             const el = document.getElementById(field);
             if (el) el.value = config[field] || "";
         }
+        document.getElementById("skipPinned").checked = config.skipPinned || false;
     }
 }
 
@@ -44,6 +45,7 @@ document.getElementById("saveConfig").addEventListener("click", async () => {
     for (const field of configFields) {
         config[field] = document.getElementById(field).value.trim();
     }
+    config.skipPinned = document.getElementById("skipPinned").checked;
     await window.bulkord.saveConfig(config);
     showToast(document.getElementById("configStatus"), "Configuration saved.", "success");
 });
@@ -226,9 +228,10 @@ async function refreshStatus() {
             <div class="status-row"><span class="label">Author ID</span><span class="value">${config.authorId || "(not set)"}</span></div>
             <div class="status-row"><span class="label">Guild ID</span><span class="value">${config.guildId || "(not set)"}</span></div>
             <div class="status-row"><span class="label">Channel ID</span><span class="value">${config.channelId || "(not set)"}</span></div>
-            <div class="status-row"><span class="label">Min ID</span><span class="value">${config.minId || "(not set)"}</span></div>
-            <div class="status-row"><span class="label">Max ID</span><span class="value">${config.maxId || "(not set)"}</span></div>
+            <div class="status-row"><span class="label">Delete After ID</span><span class="value">${config.startMessageId || "(not set)"}</span></div>
+            <div class="status-row"><span class="label">Delete Before ID</span><span class="value">${config.endMessageId || "(not set)"}</span></div>
             <div class="status-row"><span class="label">Content</span><span class="value">${config.content || "(not set)"}</span></div>
+            <div class="status-row"><span class="label">Skip Pinned</span><span class="value">${config.skipPinned ? "Yes" : "No"}</span></div>
         `;
     } else {
         configEl.innerHTML = `<p class="text-muted">No configuration found.</p>`;
@@ -239,3 +242,33 @@ async function refreshStatus() {
         <div class="big-number-label">messages in database</div>
     `;
 }
+
+// --- Data Management ---
+function makeConfirmBtn(btnId, label, action, toastId) {
+    let confirmPending = false;
+    let confirmTimer = null;
+
+    document.getElementById(btnId).addEventListener("click", async () => {
+        const btn = document.getElementById(btnId);
+        if (!confirmPending) {
+            confirmPending = true;
+            btn.textContent = "Click again to confirm";
+            confirmTimer = setTimeout(() => {
+                confirmPending = false;
+                btn.textContent = label;
+            }, 3000);
+            return;
+        }
+        clearTimeout(confirmTimer);
+        confirmPending = false;
+        btn.textContent = label;
+
+        const result = await action();
+        showToast(document.getElementById(toastId),
+            result.success ? `${label} successful.` : `Error: ${result.error}`,
+            result.success ? "success" : "error");
+    });
+}
+
+makeConfirmBtn("clearConfig", "Clear Config", window.bulkord.clearConfig, "dataMgmtStatus");
+makeConfirmBtn("clearDb", "Clear Database", window.bulkord.clearDb, "dataMgmtStatus");
