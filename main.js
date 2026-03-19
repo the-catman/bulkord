@@ -133,8 +133,12 @@ function createInstance(config, dbPath = "messages.db") {
 
             const allMessages = searchPage.messages
                 .filter(m => m.length && m[0]?.channel_id && m[0]?.id);
+
+            const undeletableMessageTypes = [1, 2, 3, 4, 5, 21];
+
             const messages = allMessages
                 .filter(m => !(config.skipPinned && m[0]?.pinned))
+                .filter(m => !undeletableMessageTypes.includes(m[0]?.type))
                 .map(m => [m[0].channel_id, m[0].id]);
 
             if (allMessages.length === 0) break;
