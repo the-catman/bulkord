@@ -18,7 +18,7 @@ Delete your account entirely (or get banned from Discord for absolutely no reaso
 
 [This video](https://www.youtube.com/watch?v=g5FbRfwMEuo) goes more in-depth than I am here, but the bottom line is that you should routinely clean up your messages so you don't have a huge amount of message history sitting there collecting dust. Additionally, [this comment](https://www.youtube.com/watch?v=g5FbRfwMEuo&lc=UgxLE0z6-vh5K4WDcK94AaABAg) on the same video (alongside many others) is an excellent example of why you should be very careful with this application.
 
-Oh and btw, despite the fact that tools like this delete your messages from _other_ users, we don't know if Discord actually honors normal message deleting in their ervers. There's _zero_ transparency about where your data actually goes or how long they keep backups. They could be storing deleted messages in cold storage for months or years. Given that they literally have hundreds if not thousands of petabytes of messages stored already, they have no reason to not store the 0.001% of messages that are deleted.
+Oh and btw, despite the fact that tools like this delete your messages from _other_ users, we don't know if Discord actually honors normal message deleting in their servers. There's _zero_ transparency about where your data actually goes or how long they keep backups. They could be storing deleted messages in cold storage for months or years. Given that they literally have tens if not hundreds of petabytes of messages stored already, they have no reason to not store the 0.001% of messages that are deleted.
 
 My honest advice is that if you care at all about your privacy, then wipe your profile and uninstall this garbage application and don't look back.
 
