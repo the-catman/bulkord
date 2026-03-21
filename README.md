@@ -4,7 +4,23 @@ Bulk Delete Discord Messages.
 
 ## Warning
 
-Using self-bots or user tokens violates Discord's Terms of Service and may result in account termination. This tool is unsafe for script kiddies and should be used entirely at your own risk.
+Using self-bots or user tokens violates Discord's Terms of Service and may result in account termination. This tool should be used entirely at your own risk.
+
+## Why Even Bother Deleting?
+
+This is going to be a bit of a rant so get ready.
+
+The simple answer is that Discord doesn't give you a built in way to delete all your messages. And that's understandable from an evil collecting-and-selling-your-data-company's point of view (which Discord is), as these companies have zero incentive to let you disappear completely.
+
+Get banned from a server? Congrats, your messages are now inaccessible to you but still sitting on Discord's servers tied to your username and ID. You can't delete them anymore. They might as well be a permanent part of that server's history whether you like it or not.
+
+Delete your account entirely (or get banned from Discord for absolutely no reason whatsoever?) Cool, your messages are still there. Your username disappears, but your user ID doesn't get decoupled from your messages. Bot developers, archivists, and literally anyone with access to that server can still see what you said and when.
+
+[This video](https://www.youtube.com/watch?v=g5FbRfwMEuo) goes more in-depth than I am here, but the bottom line is that you should routinely clean up your messages so you don't have a huge amount of message history sitting there collecting dust. Additionally, [this comment](https://www.youtube.com/watch?v=g5FbRfwMEuo&lc=UgxLE0z6-vh5K4WDcK94AaABAg) on the same video (alongside many others) is an excellent example of why you should be very careful with this application.
+
+Oh and btw, despite the fact that tools like this delete your messages from _other_ users, we don't know if Discord actually honors normal message deleting in their ervers. There's _zero_ transparency about where your data actually goes or how long they keep backups. They could be storing deleted messages in cold storage for months or years. Given that they literally have hundreds if not thousands of petabytes of messages stored already, they have no reason to not store the 0.001% of messages that are deleted.
+
+My honest advice is that if you care at all about your privacy, then wipe your profile and uninstall this garbage application and don't look back.
 
 ## Overview
 
