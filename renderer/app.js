@@ -1,4 +1,39 @@
-// --- Panel switching ---
+// ============================================================================
+// Bulkord Renderer - UI Logic
+// ============================================================================
+
+// --- Helpers ---
+
+function maskToken(token) {
+    if (!token || token.length < 8) return "(not set)";
+    return token.slice(0, 4) + "\u2022".repeat(Math.min(token.length - 8, 20)) + token.slice(-4);
+}
+
+function showToast(el, message, type) {
+    el.textContent = message;
+    el.className = "toast " + type;
+    setTimeout(() => { el.textContent = ""; el.className = "toast"; }, 4000);
+}
+
+function setProgressBar(fillId, textId, percent, text) {
+    document.getElementById(fillId).style.width = percent + "%";
+    document.getElementById(textId).textContent = text;
+}
+
+function setOperationState(btn, cancelBtn, progressArea, info, isRunning, infoText) {
+    btn.disabled = isRunning;
+    cancelBtn.style.display = isRunning ? "inline-block" : "none";
+    progressArea.style.display = isRunning ? "block" : "none";
+    info.textContent = infoText;
+}
+
+function showResultColor(el, success) {
+    el.style.color = success ? "var(--green)" : "var(--red)";
+    setTimeout(() => { el.style.color = ""; }, 5000);
+}
+
+// --- Panel Switching ---
+
 const navBtns = document.querySelectorAll(".nav-btn");
 const panels = document.querySelectorAll(".panel");
 
@@ -14,19 +49,8 @@ navBtns.forEach(btn => {
     });
 });
 
-// --- Helpers ---
-function maskToken(token) {
-    if (!token || token.length < 8) return "(not set)";
-    return token.slice(0, 4) + "\u2022".repeat(Math.min(token.length - 8, 20)) + token.slice(-4);
-}
+// --- Configure Panel ---
 
-function showToast(el, message, type) {
-    el.textContent = message;
-    el.className = "toast " + type;
-    setTimeout(() => { el.textContent = ""; el.className = "toast"; }, 4000);
-}
-
-// --- Configure ---
 const configFields = ["authToken", "authorId", "guildId", "channelId", "startMessageId", "endMessageId", "content"];
 
 async function loadConfigIntoForm() {
@@ -52,7 +76,8 @@ document.getElementById("saveConfig").addEventListener("click", async () => {
 
 loadConfigIntoForm();
 
-// --- Search ---
+// --- Search Panel ---
+
 let searching = false;
 
 document.getElementById("startSearch").addEventListener("click", async () => {
@@ -64,34 +89,26 @@ document.getElementById("startSearch").addEventListener("click", async () => {
     const progressArea = document.getElementById("searchProgress");
     const info = document.getElementById("searchInfo");
 
-    btn.disabled = true;
-    cancelBtn.style.display = "inline-block";
-    progressArea.style.display = "block";
-    info.textContent = "Searching...";
-    document.getElementById("searchFill").style.width = "0%";
-    document.getElementById("searchText").textContent = "Fetched 0 / 0 messages";
+    setOperationState(btn, cancelBtn, progressArea, info, true, "Searching...");
+    setProgressBar("searchFill", "searchText", 0, "Fetched 0 / 0 messages");
 
     window.bulkord.onSearchProgress(({ fetched, total }) => {
         const pct = total > 0 ? Math.min((fetched / total) * 100, 100) : 0;
-        document.getElementById("searchFill").style.width = pct + "%";
-        document.getElementById("searchText").textContent = `Fetched ${fetched.toLocaleString()} / ${total.toLocaleString()} messages`;
+        setProgressBar("searchFill", "searchText", pct, 
+            `Fetched ${fetched.toLocaleString()} / ${total.toLocaleString()} messages`);
     });
 
     const result = await window.bulkord.startSearch();
     searching = false;
-    btn.disabled = false;
-    cancelBtn.style.display = "none";
-
+    setOperationState(btn, cancelBtn, progressArea, info, false, 
+        result.success 
+            ? `Search complete. ${result.messageCount.toLocaleString()} messages in database.`
+            : `Error: ${result.error}`);
+    
     if (result.success) {
         document.getElementById("searchFill").style.width = "100%";
-        info.textContent = `Search complete. ${result.messageCount.toLocaleString()} messages in database.`;
-        info.style.color = "var(--green)";
-    } else {
-        info.textContent = `Error: ${result.error}`;
-        info.style.color = "var(--red)";
     }
-
-    setTimeout(() => { info.style.color = ""; }, 5000);
+    showResultColor(info, result.success);
 });
 
 document.getElementById("cancelSearch").addEventListener("click", async () => {
@@ -99,7 +116,8 @@ document.getElementById("cancelSearch").addEventListener("click", async () => {
     document.getElementById("searchInfo").textContent = "Cancelling...";
 });
 
-// --- Delete ---
+// --- Delete Panel ---
+
 let deleting = false;
 
 async function refreshDeleteCount() {
@@ -125,38 +143,26 @@ document.getElementById("startDelete").addEventListener("click", async () => {
     const progressArea = document.getElementById("deleteProgress");
     const info = document.getElementById("deleteInfo");
 
-    btn.disabled = true;
-    cancelBtn.style.display = "inline-block";
-    progressArea.style.display = "block";
-    info.textContent = "Deleting...";
-    document.getElementById("deleteFill").style.width = "0%";
-    document.getElementById("deleteText").textContent = "Deleted 0 / 0 messages";
+    setOperationState(btn, cancelBtn, progressArea, info, true, "Deleting...");
+    setProgressBar("deleteFill", "deleteText", 0, "Deleted 0 / 0 messages");
 
     window.bulkord.onDeleteProgress(({ deleted, total, skipped, reason }) => {
         const pct = total > 0 ? Math.min((deleted / total) * 100, 100) : 0;
-        document.getElementById("deleteFill").style.width = pct + "%";
-        if (skipped) {
-            document.getElementById("deleteText").textContent = `Skipped ${reason} message. ${deleted.toLocaleString()} / ${total.toLocaleString()} processed`;
-        } else {
-            document.getElementById("deleteText").textContent = `Deleted ${deleted.toLocaleString()} / ${total.toLocaleString()} messages`;
-        }
+        const text = skipped 
+            ? `Skipped ${reason} message. ${deleted.toLocaleString()} / ${total.toLocaleString()} processed`
+            : `Deleted ${deleted.toLocaleString()} / ${total.toLocaleString()} messages`;
+        setProgressBar("deleteFill", "deleteText", pct, text);
     });
 
     const result = await window.bulkord.startDelete();
     deleting = false;
-    btn.disabled = false;
-    cancelBtn.style.display = "none";
-
+    setOperationState(btn, cancelBtn, progressArea, info, false,
+        result.success ? "All messages deleted." : `Error: ${result.error}`);
+    
     if (result.success) {
         document.getElementById("deleteFill").style.width = "100%";
-        info.textContent = "All messages deleted.";
-        info.style.color = "var(--green)";
-    } else {
-        info.textContent = `Error: ${result.error}`;
-        info.style.color = "var(--red)";
     }
-
-    setTimeout(() => { info.style.color = ""; }, 5000);
+    showResultColor(info, result.success);
 });
 
 document.getElementById("cancelDelete").addEventListener("click", async () => {
@@ -164,7 +170,8 @@ document.getElementById("cancelDelete").addEventListener("click", async () => {
     document.getElementById("deleteInfo").textContent = "Cancelling...";
 });
 
-// --- Extract ---
+// --- Extract Panel ---
+
 let extracting = false;
 let extractPath = null;
 
@@ -190,14 +197,12 @@ document.getElementById("startExtract").addEventListener("click", async () => {
     progressArea.style.display = "block";
     info.textContent = "Extracting...";
     info.style.color = "";
-    document.getElementById("extractFill").style.width = "0%";
-    document.getElementById("extractText").textContent = "Processing 0 / 0 channels";
+    setProgressBar("extractFill", "extractText", 0, "Processing 0 / 0 channels");
 
     window.bulkord.onExtractProgress(({ current, totalFolders, messagesExtracted }) => {
         const pct = totalFolders > 0 ? Math.min((current / totalFolders) * 100, 100) : 0;
-        document.getElementById("extractFill").style.width = pct + "%";
-        document.getElementById("extractText").textContent =
-            `Processing ${current} / ${totalFolders} channels (${messagesExtracted.toLocaleString()} messages)`;
+        setProgressBar("extractFill", "extractText", pct,
+            `Processing ${current} / ${totalFolders} channels (${messagesExtracted.toLocaleString()} messages)`);
     });
 
     const result = await window.bulkord.startExtract(extractPath);
@@ -207,16 +212,14 @@ document.getElementById("startExtract").addEventListener("click", async () => {
     if (result.success) {
         document.getElementById("extractFill").style.width = "100%";
         info.textContent = `Extracted ${result.messages.toLocaleString()} messages from ${result.channels} channels.`;
-        info.style.color = "var(--green)";
     } else {
         info.textContent = `Error: ${result.error}`;
-        info.style.color = "var(--red)";
     }
-
-    setTimeout(() => { info.style.color = ""; }, 5000);
+    showResultColor(info, result.success);
 });
 
-// --- Status ---
+// --- Status Panel ---
+
 async function refreshStatus() {
     const { config, messageCount } = await window.bulkord.getStatus();
     const configEl = document.getElementById("statusConfig");
@@ -244,6 +247,7 @@ async function refreshStatus() {
 }
 
 // --- Data Management ---
+
 function makeConfirmBtn(btnId, label, action, toastId) {
     let confirmPending = false;
     let confirmTimer = null;
