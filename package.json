@@ -10,12 +10,12 @@
         "cli": "node cli.js"
     },
     "dependencies": {
-        "better-sqlite3": "^12.5.0",
+        "better-sqlite3": "^12.10.0",
         "json-bigint": "^1.0.0"
     },
     "devDependencies": {
-        "electron": "^33.0.0",
-        "electron-builder": "^25.1.8"
+        "electron": "^40.0.1",
+        "electron-builder": "^26.8.1"
     },
     "build": {
         "appId": "com.bulkord.app",
@@ -26,7 +26,8 @@
         "files": [
             "main.js",
             "electron/**/*",
-            "renderer/**/*"
+            "renderer/**/*",
+            "lib/**/*"
         ],
         "win": {
             "target": "portable"
