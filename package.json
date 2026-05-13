@@ -34,6 +34,14 @@
         },
         "portable": {
             "artifactName": "Bulkord.exe"
+        },
+        "linux": {
+            "target": "AppImage",
+            "artifactName": "Bulkord.AppImage"
+        },
+        "mac": {
+            "target": "dmg",
+            "artifactName": "Bulkord.dmg"
         }
     }
 }

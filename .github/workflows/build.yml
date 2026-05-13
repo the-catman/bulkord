@@ -7,7 +7,23 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            build_args: --win
+            artifact_name: windows
+            artifact_glob: dist/*.exe
+          - os: ubuntu-latest
+            build_args: --linux
+            artifact_name: linux
+            artifact_glob: dist/*.AppImage
+          - os: macos-latest
+            build_args: --mac
+            artifact_name: macos
+            artifact_glob: dist/*.dmg
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v4
@@ -21,13 +37,29 @@ jobs:
         run: npm install
 
       - name: Build app
-        run: npm run build
+        run: npx electron-builder ${{ matrix.build_args }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.artifact_glob }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: build-${{ github.run_number }}
-          files: dist/*.exe
+          files: artifacts/**/*
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

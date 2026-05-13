@@ -7,5 +7,4 @@ dist/
 *.sqlite
 *.sqlite3
 
-package-lock.json
 config.json
