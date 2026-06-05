@@ -9,5 +9,6 @@ fs.writeFileSync("config.json", `{
     "startMessageId": "",
     "endMessageId": "",
     "content": "",
-    "skipPinned": false
+    "skipPinned": false,
+    "dmSearch": false
 }`);

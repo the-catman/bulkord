@@ -61,6 +61,7 @@ async function loadConfigIntoForm() {
             if (el) el.value = config[field] || "";
         }
         document.getElementById("skipPinned").checked = config.skipPinned || false;
+        document.getElementById("dmSearch").checked = config.dmSearch || false;
     }
 }
 
@@ -70,6 +71,7 @@ document.getElementById("saveConfig").addEventListener("click", async () => {
         config[field] = document.getElementById(field).value.trim();
     }
     config.skipPinned = document.getElementById("skipPinned").checked;
+    config.dmSearch = document.getElementById("dmSearch").checked;
     await window.bulkord.saveConfig(config);
     showToast(document.getElementById("configStatus"), "Configuration saved.", "success");
 });
@@ -235,6 +237,7 @@ async function refreshStatus() {
             <div class="status-row"><span class="label">Delete Before ID</span><span class="value">${config.endMessageId || "(not set)"}</span></div>
             <div class="status-row"><span class="label">Content</span><span class="value">${config.content || "(not set)"}</span></div>
             <div class="status-row"><span class="label">Skip Pinned</span><span class="value">${config.skipPinned ? "Yes" : "No"}</span></div>
+            <div class="status-row"><span class="label">Search All DMs</span><span class="value">${config.dmSearch ? "Yes" : "No"}</span></div>
         `;
     } else {
         configEl.innerHTML = `<p class="text-muted">No configuration found.</p>`;

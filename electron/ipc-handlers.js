@@ -46,7 +46,7 @@ function registerHandlers({ getMainWindow, getConfigPath, getDbPath, getUserData
         const config = loadConfig();
         if (!config) return { success: false, error: "No configuration found." };
         if (!config.authToken) return { success: false, error: "Auth token is not set." };
-        if (!config.guildId && !config.channelId) return { success: false, error: "Guild ID or Channel ID must be set." };
+        if (!config.dmSearch && !config.guildId && !config.channelId) return { success: false, error: "Guild ID or Channel ID must be set (or enable Search all DMs)." };
 
         activeInstance = createInstance(config, getDbPath());
         try {

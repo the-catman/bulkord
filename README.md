@@ -30,6 +30,8 @@ The tool operates in two modes: Search mode retrieves messages and stores them l
 
 Searching can be filtered by author ID, channel ID, message content, and minimum or maximum message IDs. After each search or delete action, a randomized cooldown is applied to reduce the likelihood of triggering rate limits.
 
+Enabling **Search all DMs** uses Discord's global cross-DM search to retrieve matching messages from every DM and group DM at once, without needing a guild or channel ID. The same author/content/message-ID filters apply.
+
 Running a Discord client during the operation is strongly recommended, as this reduces the risk of termination. Sending messages while the script is running should be avoided.
 
 ## Desktop App
@@ -38,7 +40,7 @@ Run the portable `Bulkord.exe`, no installation required.
 
 The app has five panels:
 
-- **Configure:** set your auth token, author ID, guild/channel IDs, and optional filters (message ID range, content, skip pinned).
+- **Configure:** set your auth token, author ID, guild/channel IDs, and optional filters (message ID range, content, skip pinned, search all DMs).
 - **Search:** search for messages and store them in the local database.
 - **Delete:** delete all messages currently stored in the database.
 - **Extract:** import messages from a Discord data package into the database (see [Discord Data Package Extraction](#discord-data-package-extraction)).
