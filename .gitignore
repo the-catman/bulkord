@@ -8,3 +8,7 @@ dist/
 *.sqlite3
 
 config.json
+
+# Chat exports
+bulkord-export*.json
+export.json
