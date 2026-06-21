@@ -5,6 +5,10 @@ contextBridge.exposeInMainWorld("bulkord", {
     saveConfig: (config) => ipcRenderer.invoke("config:save", config),
     startSearch: () => ipcRenderer.invoke("search:start"),
     startDelete: () => ipcRenderer.invoke("delete:start"),
+
+    selectExportFile: () => ipcRenderer.invoke("export:select-file"),
+    selectResumeFile: () => ipcRenderer.invoke("export:select-resume-file"),
+    startExport: (path, resume) => ipcRenderer.invoke("export:start", path, resume),
     getStatus: () => ipcRenderer.invoke("status:get"),
     cancelOperation: () => ipcRenderer.invoke("operation:cancel"),
 
@@ -26,5 +30,9 @@ contextBridge.exposeInMainWorld("bulkord", {
     onExtractProgress: (callback) => {
         ipcRenderer.removeAllListeners("extract:progress");
         ipcRenderer.on("extract:progress", (_event, data) => callback(data));
+    },
+    onExportProgress: (callback) => {
+        ipcRenderer.removeAllListeners("export:progress");
+        ipcRenderer.on("export:progress", (_event, data) => callback(data));
     },
 });

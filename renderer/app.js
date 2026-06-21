@@ -118,6 +118,79 @@ document.getElementById("cancelSearch").addEventListener("click", async () => {
     document.getElementById("searchInfo").textContent = "Cancelling...";
 });
 
+// --- Export Panel ---
+
+let exporting = false;
+let exportPath = null;
+let exportResume = false;
+
+document.getElementById("selectExportFile").addEventListener("click", async () => {
+    if (exporting) return;
+    const result = await window.bulkord.selectExportFile();
+    if (result.canceled) return;
+
+    exportPath = result.path;
+    exportResume = false;
+    document.getElementById("exportPathLabel").textContent = exportPath;
+    document.getElementById("exportInfo").textContent = "";
+    document.getElementById("startExport").disabled = false;
+});
+
+document.getElementById("selectResumeFile").addEventListener("click", async () => {
+    if (exporting) return;
+    const result = await window.bulkord.selectResumeFile();
+    if (result.canceled) return;
+
+    const info = document.getElementById("exportInfo");
+    if (result.error) {
+        info.textContent = `Error: ${result.error}`;
+        showResultColor(info, false);
+        return;
+    }
+
+    exportPath = result.path;
+    exportResume = true;
+    document.getElementById("exportPathLabel").textContent = exportPath;
+    info.textContent = `Resuming: ${result.count.toLocaleString()} messages already saved (oldest ${result.oldestTimestamp.slice(0, 10)}). New messages will continue older than that.`;
+    document.getElementById("startExport").disabled = false;
+});
+
+document.getElementById("startExport").addEventListener("click", async () => {
+    if (exporting || !exportPath) return;
+    exporting = true;
+
+    const btn = document.getElementById("startExport");
+    const cancelBtn = document.getElementById("cancelExport");
+    const progressArea = document.getElementById("exportProgress");
+    const info = document.getElementById("exportInfo");
+
+    setOperationState(btn, cancelBtn, progressArea, info, true, "Exporting...");
+    setProgressBar("exportFill", "exportText", 0, "Exported 0 / 0 messages");
+
+    window.bulkord.onExportProgress(({ fetched, total, written }) => {
+        const pct = total > 0 ? Math.min((fetched / total) * 100, 100) : 0;
+        setProgressBar("exportFill", "exportText", pct,
+            `Exported ${written.toLocaleString()} / ${total.toLocaleString()} messages`);
+    });
+
+    const result = await window.bulkord.startExport(exportPath, exportResume);
+    exporting = false;
+    setOperationState(btn, cancelBtn, progressArea, info, false,
+        result.success
+            ? `Export complete. ${result.exported.toLocaleString()} ${exportResume ? "new " : ""}messages written.`
+            : `Error: ${result.error}`);
+
+    if (result.success) {
+        document.getElementById("exportFill").style.width = "100%";
+    }
+    showResultColor(info, result.success);
+});
+
+document.getElementById("cancelExport").addEventListener("click", async () => {
+    await window.bulkord.cancelOperation();
+    document.getElementById("exportInfo").textContent = "Cancelling...";
+});
+
 // --- Delete Panel ---
 
 let deleting = false;

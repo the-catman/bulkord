@@ -8,6 +8,7 @@ const fs = require("fs");
 
 const { createInstance } = require("../lib/discord");
 const { extractFromPackage } = require("../lib/extractor");
+const { inspect, prepareAppend } = require("../lib/exportfile");
 
 let activeInstance = null;
 
@@ -58,6 +59,73 @@ function registerHandlers({ getMainWindow, getConfigPath, getDbPath, getUserData
             });
             const count = activeInstance.getMessageCount();
             return { success: true, messageCount: count };
+        } catch (err) {
+            return { success: false, error: err.message };
+        } finally {
+            activeInstance.close();
+            activeInstance = null;
+        }
+    });
+
+    // --- Export ---
+    ipcMain.handle("export:select-file", async () => {
+        const mainWindow = getMainWindow();
+        const result = await dialog.showSaveDialog(mainWindow, {
+            title: "Save Chat Export",
+            defaultPath: "bulkord-export.json",
+            filters: [{ name: "JSON", extensions: ["json"] }],
+        });
+        if (result.canceled || !result.filePath) return { canceled: true };
+        return { canceled: false, path: result.filePath };
+    });
+
+    ipcMain.handle("export:select-resume-file", async () => {
+        const mainWindow = getMainWindow();
+        const result = await dialog.showOpenDialog(mainWindow, {
+            title: "Resume a Previous Chat Export",
+            filters: [{ name: "JSON", extensions: ["json"] }],
+            properties: ["openFile"],
+        });
+        if (result.canceled || result.filePaths.length === 0) return { canceled: true };
+
+        const path = result.filePaths[0];
+        try {
+            const summary = inspect(path);
+            if (!summary) return { canceled: false, error: "No messages found in that file to resume from." };
+            return { canceled: false, path, ...summary };
+        } catch (err) {
+            return { canceled: false, error: err.message };
+        }
+    });
+
+    ipcMain.handle("export:start", async (_event, outputPath, resume) => {
+        const config = loadConfig();
+        if (!config) return { success: false, error: "No configuration found." };
+        if (!config.authToken) return { success: false, error: "Auth token is not set." };
+        if (!config.dmSearch && !config.guildId && !config.channelId) return { success: false, error: "Guild ID or Channel ID must be set (or enable Search all DMs)." };
+        if (!outputPath) return { success: false, error: "No output file selected." };
+
+        let options = {};
+        if (resume) {
+            const { oldestId, count } = prepareAppend(outputPath);
+            if (oldestId) {
+                options = {
+                    startCursor: (BigInt(oldestId) - 1n).toString(),
+                    append: true,
+                    leadingComma: count > 0,
+                };
+            }
+        }
+
+        activeInstance = createInstance(config, getDbPath());
+        try {
+            const exported = await activeInstance.handleExportMode(outputPath, options, (fetched, total, written) => {
+                const mainWindow = getMainWindow();
+                if (mainWindow && !mainWindow.isDestroyed()) {
+                    mainWindow.webContents.send("export:progress", { fetched, total, written });
+                }
+            });
+            return { success: true, exported };
         } catch (err) {
             return { success: false, error: err.message };
         } finally {

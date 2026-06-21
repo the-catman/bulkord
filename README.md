@@ -38,10 +38,11 @@ Running a Discord client during the operation is strongly recommended, as this r
 
 Run the portable `Bulkord.exe`, no installation required.
 
-The app has five panels:
+The app has six panels:
 
 - **Configure:** set your auth token, author ID, guild/channel IDs, and optional filters (message ID range, content, skip pinned, search all DMs).
 - **Search:** search for messages and store them in the local database.
+- **Export:** run the same search but save the full message data to a JSON file instead of the database (see [Chat Exporter](#chat-exporter)).
 - **Delete:** delete all messages currently stored in the database.
 - **Extract:** import messages from a Discord data package into the database (see [Discord Data Package Extraction](#discord-data-package-extraction)).
 - **Status:** view current configuration and database message count. Includes a **Data Management** section to clear the config file or database.
@@ -88,6 +89,30 @@ Set `mode` to `"search"` to find messages, then `"delete"` to remove them.
 ## Search Mode
 
 In search mode, messages are retrieved in batches of roughly 25 and written to the `messages.db` SQLite database.
+
+## Chat Exporter
+
+The Chat Exporter uses the exact same search (and the same filters: author ID, content, channel/guild or **Search all DMs**, and message ID range) as Search mode, but instead of storing `(channel_id, message_id)` pairs in the database, it streams the full raw message objects (message ID, content, reactions, embeds, attachments, author, timestamp, and everything else Discord returns) into a single JSON file.
+
+The output is a flat JSON array of message objects. Unlike Search, the exporter does not drop pinned or system/undeletable messages: it saves everything matched.
+
+Because Discord's search API stops paginating past roughly 10,000 results, the exporter walks backwards by message ID (keyset pagination) rather than by offset, so it can export an entire channel no matter how large. The same applies to Search mode.
+
+### Resuming
+
+Large exports can be continued instead of restarted. Choosing **Resume Existing...** (desktop) reads the oldest message already in a previous export file and continues strictly older than it, appending the new messages into the same file — so you never re-fetch what you already have. This also repairs a file that was cut off mid-export (a missing closing `]`).
+
+### Desktop App
+
+Open the **Export** panel, click **New File...** to pick where the `.json` file is saved (or **Resume Existing...** to continue a previous export), then click **Start Export**. Progress is shown as messages are written, and the export can be cancelled at any time — a cancelled export still produces a valid JSON file.
+
+### CLI
+
+Set `mode` to `"export"` in `config.json`. The file is written to `export.json` by default, or to the path in the optional `exportPath` field. To resume an existing export file instead of overwriting it, set `"exportResume": true`. Then run:
+
+```
+node main.js
+```
 
 ## Delete Mode
 
