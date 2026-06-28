@@ -30,7 +30,7 @@ The tool operates in two modes: Search mode retrieves messages and stores them l
 
 Searching can be filtered by author ID, channel ID, message content, and minimum or maximum message IDs. After each search or delete action, a randomized cooldown is applied to reduce the likelihood of triggering rate limits.
 
-Enabling **Search all DMs** uses Discord's global cross-DM search to retrieve matching messages from every DM and group DM at once, without needing a guild or channel ID. The same author/content/message-ID filters apply.
+Enabling Search all DMs uses Discord's global cross-DM search to retrieve matching messages from every DM and group DM at once, without needing a guild or channel ID. The same author/content/message-ID filters apply. Note that you may need to change a setting in Discord "By default, searching in DMs..." to "Searches across all my DMs".
 
 Running a Discord client during the operation is strongly recommended, as this reduces the risk of termination. Sending messages while the script is running should be avoided.
 
@@ -45,16 +45,16 @@ The app has six panels:
 - **Export:** run the same search but save the full message data to a JSON file instead of the database (see [Chat Exporter](#chat-exporter)).
 - **Delete:** delete all messages currently stored in the database.
 - **Extract:** import messages from a Discord data package into the database (see [Discord Data Package Extraction](#discord-data-package-extraction)).
-- **Status:** view current configuration and database message count. Includes a **Data Management** section to clear the config file or database.
+- **Status:** view current configuration and database message count. Includes a Data Management section to clear the config file or database.
 
 Config and database are stored in `%APPDATA%/bulkord/`.
 
 #### Data Management
 
-In the **Status** panel, you can use the **Data Management** section to clear your configuration or database:
+In the Status panel, you can use the Data Management section to clear your configuration or database:
 
-- **Clear Config:** deletes the `config.json` file (double-click to confirm)
-- **Clear Database:** deletes the `messages.db` file (double-click to confirm)
+- Clear Config: deletes the `config.json` file
+- Clear Database: deletes the `messages.db` file
 
 ### Building from Source
 
@@ -92,7 +92,7 @@ In search mode, messages are retrieved in batches of roughly 25 and written to t
 
 ## Chat Exporter
 
-The Chat Exporter uses the exact same search (and the same filters: author ID, content, channel/guild or **Search all DMs**, and message ID range) as Search mode, but instead of storing `(channel_id, message_id)` pairs in the database, it streams the full raw message objects (message ID, content, reactions, embeds, attachments, author, timestamp, and everything else Discord returns) into a single JSON file.
+The Chat Exporter uses the exact same search (and the same filters: author ID, content, channel/guild or Search all DMs, and message ID range) as Search mode, but instead of storing `(channel_id, message_id)` pairs in the database, it streams the full raw message objects (message ID, content, reactions, embeds, attachments, author, timestamp, and everything else Discord returns) into a single JSON file.
 
 The output is a flat JSON array of message objects. Unlike Search, the exporter does not drop pinned or system/undeletable messages: it saves everything matched.
 
@@ -100,11 +100,11 @@ Because Discord's search API stops paginating past roughly 10,000 results, the e
 
 ### Resuming
 
-Large exports can be continued instead of restarted. Choosing **Resume Existing...** (desktop) reads the oldest message already in a previous export file and continues strictly older than it, appending the new messages into the same file — so you never re-fetch what you already have. This also repairs a file that was cut off mid-export (a missing closing `]`).
+Large exports can be continued instead of restarted. Choosing Resume Existing... (desktop) reads the oldest message already in a previous export file and continues strictly older than it, appending the new messages into the same file so you never re-fetch what you already have. This also repairs a file that was cut off mid-export (a missing closing `]`).
 
 ### Desktop App
 
-Open the **Export** panel, click **New File...** to pick where the `.json` file is saved (or **Resume Existing...** to continue a previous export), then click **Start Export**. Progress is shown as messages are written, and the export can be cancelled at any time — a cancelled export still produces a valid JSON file.
+Open the Export panel, click New File... to pick where the `.json` file is saved (or Resume Existing... to continue a previous export), then click Start Export. Progress is shown as messages are written, and the export can be cancelled at any time. A cancelled export still produces a valid JSON file.
 
 ### CLI
 
@@ -116,7 +116,7 @@ node main.js
 
 ## Delete Mode
 
-In delete mode, rows inside the database are processed sequentially (one by one). Although the script can be safely stopped at any time using Ctrl+C, any messages that were being processed when it was interrupted may be retried on the next run.
+In delete mode, rows inside the database are processed sequentially (one by one). Although the CLI script can be safely stopped at any time using Ctrl+C, any messages that were being processed when it was interrupted may be retried on the next run.
 
 Note that you must still have access to the guilds and channels in order to delete messages. Messages from servers or channels you no longer have access to cannot be deleted.
 
@@ -139,7 +139,7 @@ Bulkord can also delete messages extracted from your official Discord data packa
 
 ### Desktop App
 
-Open the **Extract** panel, click **Browse** to select the `Messages` folder from your Discord data package, then click **Start Extraction**. Progress is shown as each channel is processed. After extraction, switch to the **Delete** panel to delete the messages.
+Open the Extract panel, click Browse to select the `Messages` folder from your Discord data package, then click Start Extraction. Progress is shown as each channel is processed. After extraction, switch to the Delete panel to delete the messages.
 
 ### CLI
 
