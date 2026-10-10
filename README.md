@@ -6,6 +6,8 @@ Bulk Delete Discord Messages.
 
 Using self-bots or user tokens violates Discord's Terms of Service and may result in account termination. This tool should be used entirely at your own risk.
 
+Any tool that requires pasting in your Discord token can potentially be malicious. This project is not, but don't take my word for it; do your due diligence and read the code before you use it. If you do not know how to read code (or how to point AI at code), **this project is not for you**.
+
 ## Why Even Bother Deleting?
 
 This is going to be a bit of a rant so get ready.
